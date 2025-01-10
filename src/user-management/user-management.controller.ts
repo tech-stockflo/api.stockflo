@@ -1,9 +1,9 @@
 // src/user-management/user-management.controller.ts
 
-import { Body, Controller, Get, Param, Put, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Put, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { UserManagementService } from './user-management.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RoleGuard } from 'src/guards/role/role.guard';
 import { Roles } from 'src/auth/role.decorator';
 import { Role } from '@prisma/client';
@@ -11,11 +11,25 @@ import { UtilsService } from 'src/utils/utils.service';
 
 @ApiTags('User management')
 @Controller('user-management')
+@ApiBearerAuth()
 export class UserManagementController {
   constructor(
     private readonly userManagementService: UserManagementService,
     private readonly utils: UtilsService,
   ) {}
+
+  @Roles(Role.ADMIN, Role.STOCK_MANAGER, Role.STOCK_OWNER)
+  @UseGuards(RoleGuard)
+  @Get('user')
+  @ApiOperation({
+    summary: 'Get user',
+    description: 'This endpoint fetches the user.',
+  })
+  async getUser(@Req() req: Request){
+    const accessToken = req.cookies['ACCESS_TOKEN'] || req.headers['authorization'].split(' ')[1]
+    const decodedToken = await this.utils.decodeAccessToken(accessToken)
+    return this.userManagementService.getUser(decodedToken.id)
+  }
   
   @Roles(Role.ADMIN)
   @UseGuards(RoleGuard)
@@ -37,18 +51,5 @@ export class UserManagementController {
   })
   async enableAccount(@Param('userId') userId: string){
     return this.userManagementService.enableAccount(userId)
-  }
-
-  @Roles(Role.ADMIN, Role.STOCK_MANAGER, Role.STOCK_OWNER)
-  @UseGuards(RoleGuard)
-  @Get('user')
-  @ApiOperation({
-    summary: 'Get user',
-    description: 'This endpoint fetches the user.',
-  })
-  async getUser(@Req() req: Request){
-    const accessToken = req.cookies['ACCESS_TOKEN'] || req.headers['authorization'].split(' ')[1]
-    const decodedToken = await this.utils.decodeAccessToken(accessToken)
-    return this.userManagementService.getUser(decodedToken.id)
   }
 }

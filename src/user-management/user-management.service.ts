@@ -2,17 +2,11 @@
 
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UtilsService } from 'src/utils/utils.service';
 
 @Injectable()
 export class UserManagementService {
-    private rateLimiter = new RateLimiterMemory({
-        points: 5,
-        duration: 60 * 5,
-    });
-
     constructor(
         private readonly prisma: PrismaService,
         private readonly utils: UtilsService,
