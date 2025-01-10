@@ -19,7 +19,22 @@ export class UserManagementService {
         private readonly config: ConfigService,
     ) { }
 
-    
+    // Get user by userId
+    async getUser(userId: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId }
+        })
+        if (!user) {
+            throw new NotFoundException('User not found')
+        }
+        const { password, ...userWithoutPassword } = user
+        return {
+            success: true,
+            data: userWithoutPassword,
+            statusCode: HttpStatus.OK
+        }
+    }
+
     // Disable account by admin
     async disableAccount(userId: string) {
         const user = await this.prisma.user.findUnique({

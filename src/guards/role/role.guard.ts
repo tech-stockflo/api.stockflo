@@ -29,7 +29,7 @@ export class RoleGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<Request>();
     const authHeader = request.headers['authorization'];
-    const token = authHeader?.split(' ')[1] || request.cookies?.accessToken;
+    const token = authHeader?.split(' ')[1] || request.cookies?.ACCESS_TOKEN;
 
     if (!token) {
       throw new UnauthorizedException('Authentication token not found');

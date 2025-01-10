@@ -26,3 +26,15 @@ export class DisableAcountDto {
     @IsString()
     userId: string;
 }
+
+export class ChangeEmailDto {
+    @IsString()
+    userId: string;
+    
+    @ApiProperty({
+        description: 'The new email address',
+        example: 'newemail@example.com',
+    })
+    @IsEmail()
+    newEmail: string;
+}

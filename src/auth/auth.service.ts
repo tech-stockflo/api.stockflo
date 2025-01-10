@@ -17,7 +17,7 @@ import { UserDto } from 'src/auth/dto/user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetEmailDto, SendActivationEmailDto } from './dto/send-email.dto';
 import { ChangePasswordDto, ResetPasswordDto } from './dto/reset-password.dto';
-import { ActivateAccountDto } from './dto/account.dto';
+import { ActivateAccountDto, ChangeEmailDto } from './dto/account.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,12 +29,11 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly utils: UtilsService,
-    private readonly config: ConfigService,
   ) { }
 
   // Register
   async register(registerDto: UserDto) {
-    const { email, password, userName, fullName } = registerDto;
+    const { email, password, userName, fullName } = registerDto;    
     const userExists = await this.prisma.user.findFirst({
       where: {
         email: email,
@@ -46,7 +45,7 @@ export class AuthService {
     }
 
     const hashedPassword = await this.utils.hashPassword(password);
-
+    
     const newUser = await this.prisma.user.create({
       data: {
         email: email,
@@ -67,6 +66,7 @@ export class AuthService {
       email: newUser.email,
       role: newUser.role,
     })
+    
     const { password: _, ...userWithoutPassword } = newUser;
     return {
       success: true,
@@ -86,12 +86,6 @@ export class AuthService {
 
     if (!user) {
       throw new NotFoundException('User not found or account is deactivated');
-    }
-
-    if (!user.emailVerified) {
-      throw new BadRequestException(
-        'Please activate your account before logging in',
-      );
     }
 
     if(user.status === 'DISABLED'){
@@ -452,5 +446,45 @@ export class AuthService {
       success: true,
       message: 'Account activated successfully',
     };
+  }
+
+
+  // Change user email 
+  async changeUserEmail(changeEmailDto: ChangeEmailDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: changeEmailDto.userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    try {
+      // Apply rate limiting based on the user's email
+      await this.rateLimiter.consume(changeEmailDto.newEmail);
+
+      if (user.emailVerified) {
+        throw new BadRequestException('Email already verified');
+      }
+
+      await this.prisma.user.update({
+        where: { id: changeEmailDto.userId },
+        data: { email: changeEmailDto.newEmail }
+      })
+
+      return {
+        success: true,
+        message: 'Email changed successfully',
+        statusCode: HttpStatus.OK,
+      };
+      
+    } catch (err) {
+      if (err instanceof RateLimiterRes) {
+        throw new UnauthorizedException(
+          'Too many requests. Please try again later.',
+        );
+      }
+      throw err;
+    }
   }
 }

@@ -9,7 +9,7 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetEmailDto, SendActivationEmailDto } from './dto/send-email.dto';
 import { ChangePasswordDto, ResetPasswordDto, VerifyResetCodeDto } from './dto/reset-password.dto';
-import { ActivateAccountDto, DisableAcountDto } from './dto/account.dto';
+import { ActivateAccountDto, ChangeEmailDto } from './dto/account.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -196,5 +196,22 @@ export class AuthController {
   })
   async activateAccount(@Body() activateAccountDto: ActivateAccountDto) {
     return this.authService.activateAccount(activateAccountDto);
+  }
+
+  @Post('change-email/:userId')
+  @ApiOperation({
+    summary: 'Change user email',
+    description: 'This endpoint changes user-email.',
+  })
+  @ApiBody({
+    description: 'Change user email',
+    type: ChangeEmailDto,
+  })
+  async changeEmail(
+    @Body() changeEmailDto: ChangeEmailDto,
+    @Param('userId') userId: string 
+  ) {
+    changeEmailDto.userId = userId
+    return this.authService.changeUserEmail(changeEmailDto);
   }
 }

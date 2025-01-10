@@ -4,11 +4,17 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
+import * as morgan from 'morgan';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: false
+  });
+
   app.setGlobalPrefix('api/v1');
+  app.enableCors({credentials: true, origin: "http://localhost:3000"});
   app.use(cookieParser());
+  app.use(morgan('tiny'));
 
   const config = new DocumentBuilder()
     .setTitle('SMS API Documentation')

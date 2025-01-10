@@ -92,6 +92,37 @@ export class UtilsService {
     });
   }
 
+  async decodeAccessToken(token: string): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.decode(token);
+      if (!decodedToken) {
+        throw new BadRequestException('Failed to decode access token');
+      }
+      return decodedToken;
+    } catch (e) {
+      if (e instanceof HttpException) {
+        throw e;
+      }
+      throw new InternalServerErrorException(e.message);
+    }
+  }
+
+  async decodeRefreshToken(token: string): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.decode(token);
+      if (!decodedToken) {
+        throw new BadRequestException('Failed to decode refresh token');
+      }
+      return decodedToken;
+    } catch (e) {
+      if (e instanceof HttpException) {
+        throw e;
+      }
+      throw new InternalServerErrorException(e.message);
+    }
+  }
+
+
   async getLoggedInUser(req: Request) {
     const authorization = req.headers.authorization;
     if (authorization) {
