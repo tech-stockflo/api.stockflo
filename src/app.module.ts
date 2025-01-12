@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { UtilsModule } from './utils/utils.module';
 import { UserManagementModule } from './user-management/user-management.module';
+import { SupplierModule } from './supplier/supplier.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserManagementModule } from './user-management/user-management.module';
     PrismaModule,
     UtilsModule,
     UserManagementModule,
+    SupplierModule,
   ],
   controllers: [],
   providers: [],

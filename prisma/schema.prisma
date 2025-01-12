@@ -34,7 +34,7 @@ model User {
 }
 
 model UserVerificationCodes {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   email     String
   otp       String
   userId    String   @default(uuid())
@@ -44,4 +44,13 @@ model UserVerificationCodes {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([expiresAt])
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  contact   String
+  status    Status   @default(ENABLED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
