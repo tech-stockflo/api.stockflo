@@ -9,7 +9,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ConfigService } from '@nestjs/config';
 import { UtilsService } from 'src/utils/utils.service';
 import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
 import { LoginDto } from './dto/login.dto';
