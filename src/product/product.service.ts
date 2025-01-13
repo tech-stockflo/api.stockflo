@@ -8,16 +8,37 @@ import { Product } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
+    const supplier = await this.prisma.supplier.findUnique({
+      where: { id: createProductDto.supplierId }
+    })
+
+    if (!supplier) {
+      throw new NotFoundException("Supplier not found")
+    }
+
+    const stock = await this.prisma.stock.findUnique({
+      where: { id: createProductDto.stockId }
+    })
+
+    if (!stock) {
+      throw new NotFoundException("Stock not found")
+    }
+
     return this.prisma.product.create({
       data: createProductDto,
     });
   }
 
   async findAll(): Promise<Product[]> {
-    return this.prisma.product.findMany();
+    return this.prisma.product.findMany({
+      include: {
+        supplier: true,
+        stock: true
+      }
+    });
   }
 
   async findOne(id: string): Promise<Product> {
