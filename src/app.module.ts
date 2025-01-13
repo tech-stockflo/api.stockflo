@@ -10,6 +10,7 @@ import { SupplierModule } from './supplier/supplier.module';
 import { StockModule } from './stock/stock.module';
 import { StockManagerModule } from './stock-manager/stock-manager.module';
 import { ProductModule } from './product/product.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -17,6 +18,10 @@ import { ProductModule } from './product/product.module';
       envFilePath: ['.env'],
       isGlobal: true,
       expandVariables: true,
+    }),
+    JwtModule.register({
+      secret: process.env.ACCESS_SECRET_KEY,
+      signOptions: { expiresIn: '1h' },
     }),
     AuthModule,
     PrismaModule,

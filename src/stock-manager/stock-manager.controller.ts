@@ -1,12 +1,18 @@
 // src/stock-manager/stock-manager.controller.dto.ts
 
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Query, UseGuards } from '@nestjs/common';
 import { StockManagerService } from './stock-manager.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateStockManagerDto, UpdateStockManagerDto } from './dto';
+import { RoleGuard } from 'src/guards/role/role.guard';
+import { Roles } from 'src/auth/role.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('Stock Managers')
 @Controller('stock-managers')
+@ApiBearerAuth()
+@UseGuards(RoleGuard)
+@Roles(Role.ADMIN, Role.STOCK_OWNER)
 export class StockManagerController {
   constructor(private readonly stockManagerService: StockManagerService) {}
 

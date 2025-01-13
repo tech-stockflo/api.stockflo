@@ -1,22 +1,10 @@
 // src/auth/auth.service.ts
 
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-  ConflictException,
-  HttpStatus,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException, ConflictException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UtilsService } from 'src/utils/utils.service';
 import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
-import { LoginDto } from './dto/login.dto';
-import { UserDto } from 'src/auth/dto/user.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { ResetEmailDto, SendActivationEmailDto } from './dto/send-email.dto';
-import { ChangePasswordDto, ResetPasswordDto } from './dto/reset-password.dto';
-import { ActivateAccountDto, ChangeEmailDto } from './dto/account.dto';
+import { ResetEmailDto, SendActivationEmailDto, ChangePasswordDto, ResetPasswordDto, ActivateAccountDto, ChangeEmailDto, RefreshTokenDto, LoginDto, UserDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +20,7 @@ export class AuthService {
 
   // Register
   async register(registerDto: UserDto) {
-    const { email, password, userName, fullName } = registerDto;    
+    const { email, password, userName, fullName } = registerDto;
     const userExists = await this.prisma.user.findFirst({
       where: {
         email: email,
@@ -44,7 +32,7 @@ export class AuthService {
     }
 
     const hashedPassword = await this.utils.hashPassword(password);
-    
+
     const newUser = await this.prisma.user.create({
       data: {
         email: email,
@@ -65,7 +53,7 @@ export class AuthService {
       email: newUser.email,
       role: newUser.role,
     })
-    
+
     const { password: _, ...userWithoutPassword } = newUser;
     return {
       success: true,
@@ -87,7 +75,7 @@ export class AuthService {
       throw new NotFoundException('User not found or account is deactivated');
     }
 
-    if(user.status === 'DISABLED'){
+    if (user.status === 'DISABLED') {
       throw new UnauthorizedException('Account disabled')
     }
 
@@ -476,7 +464,7 @@ export class AuthService {
         message: 'Email changed successfully',
         statusCode: HttpStatus.OK,
       };
-      
+
     } catch (err) {
       if (err instanceof RateLimiterRes) {
         throw new UnauthorizedException(

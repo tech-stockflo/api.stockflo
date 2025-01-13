@@ -1,11 +1,17 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
-import { ApiOperation, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { SuppliersService } from './supplier.service';
 import { SupplierDto } from './dto/supplier.dto';
+import { RoleGuard } from 'src/guards/role/role.guard';
+import { Roles } from 'src/auth/role.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('supplier')
+@ApiBearerAuth()
+@UseGuards(RoleGuard)
+@Roles(Role.ADMIN, Role.STOCK_OWNER, Role.STOCK_MANAGER)
 export class SuppliersController {
-  constructor(private readonly suppliersService: SuppliersService) {}
+  constructor(private readonly suppliersService: SuppliersService) { }
 
   @Get()
   @ApiOperation({

@@ -4,12 +4,7 @@ import { Controller, Post, Body, Res, HttpStatus, Get, Param } from '@nestjs/com
 import { Response } from 'express';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { UserDto } from 'src/auth/dto/user.dto';
-import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { ResetEmailDto, SendActivationEmailDto } from './dto/send-email.dto';
-import { ChangePasswordDto, ResetPasswordDto, VerifyResetCodeDto } from './dto/reset-password.dto';
-import { ActivateAccountDto, ChangeEmailDto } from './dto/account.dto';
+import { ResetEmailDto, SendActivationEmailDto, ChangePasswordDto, ResetPasswordDto, VerifyResetCodeDto, ActivateAccountDto, ChangeEmailDto, RefreshTokenDto, LoginDto, UserDto } from './dto';
 
 @ApiTags('Authentication')
 @Controller('auth')

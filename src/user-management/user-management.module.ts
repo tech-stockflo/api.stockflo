@@ -6,11 +6,11 @@ import { UserManagementController } from './user-management.controller';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports:[
+  imports: [
     JwtModule.register({
       secret: process.env.ACCESS_SECRET_KEY,
       signOptions: { expiresIn: '1h' },
-    })
+    }),
   ],
   controllers: [UserManagementController],
   providers: [UserManagementService],

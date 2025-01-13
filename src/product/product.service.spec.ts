@@ -1,3 +1,5 @@
+// src/product/product.service.spec.ts
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from './product.service';
 

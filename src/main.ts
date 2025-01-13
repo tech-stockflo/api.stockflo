@@ -7,9 +7,7 @@ import * as cookieParser from 'cookie-parser';
 import * as morgan from 'morgan';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: false
-  });
+  const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api/v1');
   app.enableCors({credentials: true, origin: "http://localhost:3000"});
@@ -23,7 +21,11 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/docs', app, document);
+  SwaggerModule.setup('api/v1/docs', app, document, {
+    swaggerOptions: {
+      docExpansion: 'none',
+    }
+  });
 
   await app.listen(process.env.APP_PORT);
 }

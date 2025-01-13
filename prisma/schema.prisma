@@ -59,7 +59,7 @@ model Supplier {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Procut Procut[]
+  Product Product[]
 }
 
 model Stock {
@@ -73,10 +73,10 @@ model Stock {
   updatedAt DateTime @updatedAt
 
   user   User     @relation(fields: [managerId], references: [id], onDelete: Cascade)
-  Procut Procut[]
+  Product Product[]
 }
 
-model Procut {
+model Product {
   id             String @id @default(uuid())
   name           String
   quantity       Int
