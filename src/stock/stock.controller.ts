@@ -1,6 +1,6 @@
 // src/stock/stock.controller.ts
 
-import {  Controller,  Post,  Body,  Put,  Param,  Delete,  Get,  HttpCode,  HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Delete, Get, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { StockService } from './stock.service';
 import { CreateStockDto } from './dto/create-stock.dto';
@@ -19,7 +19,7 @@ export class StockController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new stock (Stock Manager)' })
+  @ApiOperation({ summary: 'Create a new stock (Stock Owner)' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Stock created successfully.' })
   async createStock(@Body() createStockDto: CreateStockDto) {
     return this.stockService.createStock(createStockDto);
@@ -27,7 +27,7 @@ export class StockController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update an existing stock (Stock Manager)' })
+  @ApiOperation({ summary: 'Update an existing stock (Stock Owner or Stock Manager)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Stock updated successfully.' })
   async updateStock(@Param('id') id: string, @Body() updateStockDto: UpdateStockDto) {
     return this.stockService.updateStock(id, updateStockDto);
@@ -35,35 +35,35 @@ export class StockController {
 
   @Put(':id/manager')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update the manager of a stock (Stock Manager)' })
+  @ApiOperation({ summary: 'Update the manager of a stock (Stock Owner or Stock Manager)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Stock manager updated successfully.' })
-  async updateStockManager(@Param('id') id: string, @Body('managerId') managerId: string) {
-    return this.stockService.updateStockManager(id, managerId);
+  async updateStockManager(@Param('id') id: string, @Body('stockManagerId') stockManagerId: string) {
+    return this.stockService.updateStockManager(id, stockManagerId);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a stock (Stock Manager)' })
+  @ApiOperation({ summary: 'Delete a stock (Stock Owner)' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Stock deleted successfully.' })
   async deleteStock(@Param('id') id: string) {
     return this.stockService.deleteStock(id);
   }
 
-  @Get(':managerId')
+  @Get(':stockOwnerId')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all stocks by manager ID (Stock Manager)' })
+  @ApiOperation({ summary: 'Get all stocks by stock owner ID (Stock Owner)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Stocks fetched successfully.' })
-  async getAllStocks(@Param('managerId') managerId: string) {
-    return this.stockService.getAllStocks(managerId);
+  async getAllStocks(@Param('stockOwnerId') stockOwnerId: string) {
+    return this.stockService.getStockById(stockOwnerId);
   }
 
-  @Get(':managerId/:id')
+  @Get(':stockOwnerId/:id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get a specific stock by ID (Stock Manager)' })
+  @ApiOperation({ summary: 'Get a specific stock by ID (Stock Owner or Stock Manager)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Stock fetched successfully.' })
-  async getStockById(@Param('managerId') managerId: string, @Param('id') id: string) {
+  async getStockById(@Param('stockOwnerId') stockOwnerId: string, @Param('id') id: string) {
     const stock = await this.stockService.getStockById(id);
-    if (stock.managerId !== managerId) {
+    if (stock.stockOwnerId !== stockOwnerId) {
       throw new Error('You are not authorized to view this stock.');
     }
     return stock;

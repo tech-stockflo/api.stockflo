@@ -3,20 +3,83 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SupplierDto } from './dto/supplier.dto';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class SuppliersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   // Get all suppliers
-  async findAll() {
-    const suppliers = await this.prisma.supplier.findMany();
+  async findAll(query: { page: number; limit: number; status?: Status; userId?: string }) {
+    const { page, limit, status, userId } = query;
+  
+    const skip = (page - 1) * limit;
+    const take = parseInt(limit.toString(), 10); 
+    const filters: any = {};
+  
+    if (status) {
+      filters.status = status;
+    }
+  
+    if (userId) {
+      const stocks = await this.prisma.stock.findMany({
+        where: {
+          user: { id: userId }
+        },
+        select: {
+          id: true,
+        },
+      });
+  
+      if (stocks.length === 0) {
+        return {
+          success: false,
+          message: "No stock found for this user",
+          statusCode: HttpStatus.NOT_FOUND,
+        };
+      }
+  
+      const stockIds = stocks.map(stock => stock.id);
+      filters.Product = {
+        some: {
+          stockId: { in: stockIds },
+        },
+      };
+    }
+  
+    const suppliers = await this.prisma.supplier.findMany({
+      where: filters,
+      skip,
+      take,
+      include: {
+        // Product: {
+        //   take: 2
+        // },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  
+    const totalSuppliers = await this.prisma.supplier.count({
+      where: filters,
+    });
+  
     return {
       success: true,
       data: suppliers,
       statusCode: HttpStatus.OK,
+      pagination: {
+        page,
+        limit,
+        total: totalSuppliers,
+        totalPages: Math.ceil(totalSuppliers / limit),
+      },
     };
   }
+  
+  
+  
 
   // Get supplier by ID
   async findOne(id: string) {

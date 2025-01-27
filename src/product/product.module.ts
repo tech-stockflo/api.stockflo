@@ -3,16 +3,10 @@
 import { Module } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    JwtModule.register({
-      secret: process.env.ACCESS_SECRET_KEY,
-      signOptions: { expiresIn: '1h' },
-    }),
-  ],
   controllers: [ProductController],
-  providers: [ProductService],
+  providers: [ProductService, JwtService],
 })
-export class ProductModule { }
+export class ProductModule {}

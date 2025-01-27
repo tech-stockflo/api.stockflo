@@ -11,7 +11,7 @@ export async function seedUsers() {
     where: { email },
     update: {},
     create: {
-      fullName: 'Project Manager',
+      fullName: '',
       userName: 'Admin',
       email,
       password: hashedPassword,

@@ -209,4 +209,35 @@ export class AuthController {
     changeEmailDto.userId = userId
     return this.authService.changeUserEmail(changeEmailDto);
   }
+
+  @Post('/stock-manager/login')
+  @ApiOperation({
+    summary: 'Login a Stock Manager',
+    description: 'This endpoint logs in a user and returns authentication tokens.',
+  })
+  @ApiBody({
+    description: 'User login credentials',
+    type: LoginDto,
+  })
+  async loginStockManager(@Body() credentials: LoginDto, @Res() res: Response) {
+    const { data } = await this.authService.loginStockManager(credentials);
+
+    res.cookie('ACCESS_TOKEN', data.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+
+    res.cookie('REFRESH_TOKEN', data.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+
+    return res.status(HttpStatus.OK).json({
+      success: true,
+      message: 'Account logged in successfully',
+      data: process.env.NODE_ENV === 'production' ? data.user : data
+    });
+  }
 }

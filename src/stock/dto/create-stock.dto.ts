@@ -29,13 +29,21 @@ export class CreateStockDto {
   })
   @IsEnum(Status)
   @IsOptional()
-  status?: Status = 'ENABLED';
+  status?: Status = Status.ENABLED;
 
   @ApiProperty({
-    description: 'Manager ID of the stock',
+    description: 'Stock Owner ID of the stock (stock manager should be connected to this)',
+    example: 'uuid-of-owner',
+  })
+  @IsString()
+  @IsNotEmpty()
+  stockOwnerId: string;
+
+  @ApiProperty({
+    description: 'Manager ID of the stock (stock manager should be connected to this)',
     example: 'uuid-of-manager',
   })
   @IsString()
   @IsNotEmpty()
-  managerId: string;
+  stockManagerId: string;
 }

@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UtilsService } from 'src/utils/utils.service';
 import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
 import { ResetEmailDto, SendActivationEmailDto, ChangePasswordDto, ResetPasswordDto, ActivateAccountDto, ChangeEmailDto, RefreshTokenDto, LoginDto, UserDto } from './dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -182,11 +183,13 @@ export class AuthService {
         'Password Reset Code - SMS',
       );
 
+      const expiresAt = new Date(Date.now() + 10 * 60000);
+
       const storedCode = await this.prisma.userVerificationCodes.create({
         data: {
           otp: resetCode.toString(),
-          userId: user.id,
-          email: user.email
+          email: user.email,
+          expiresAt
         }
       })
 
@@ -218,7 +221,7 @@ export class AuthService {
     const storedCode = await this.prisma.userVerificationCodes.findFirst({
       where: {
         otp: resetPasswordDto.code,
-        userId: user.id,
+        email: user.email,
       },
     });
 
@@ -256,7 +259,7 @@ export class AuthService {
     const storedCode = await this.prisma.userVerificationCodes.findFirst({
       where: {
         otp: resetPasswordDto.code,
-        userId: user.id,
+        email: user.email,
       },
     });
 
@@ -359,11 +362,13 @@ export class AuthService {
         'Account Activation Code - SMS',
       );
 
+      const expiresAt = new Date(Date.now() + 10 * 60000);
+
       const storedCode = await this.prisma.userVerificationCodes.create({
         data: {
           otp: activationCode.toString(),
-          userId: user.id,
-          email: user.email
+          email: user.email,
+          expiresAt
         }
       })
 
@@ -399,7 +404,7 @@ export class AuthService {
     const storedCode = await this.prisma.userVerificationCodes.findFirst({
       where: {
         otp: activateAccountDto.code,
-        userId: user.id,
+        email: user.email,
       },
     });
 
@@ -435,7 +440,6 @@ export class AuthService {
     };
   }
 
-
   // Change user email 
   async changeUserEmail(changeEmailDto: ChangeEmailDto) {
     const user = await this.prisma.user.findUnique({
@@ -469,6 +473,61 @@ export class AuthService {
       if (err instanceof RateLimiterRes) {
         throw new UnauthorizedException(
           'Too many requests. Please try again later.',
+        );
+      }
+      throw err;
+    }
+  }
+
+  // Login
+  async loginStockManager(credentials: LoginDto) {
+    const { email, password } = credentials;
+    const user = await this.prisma.stockManager.findFirst({
+      where: {
+        OR: [{ email: email }],
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Account not found');
+    }
+
+    if (user.status === 'DISABLED') {
+      throw new UnauthorizedException('Account disabled')
+    }
+
+    try {
+      await this.rateLimiter.consume(email);
+      const passwordMatches = await this.utils.verifyPasswords(
+        user.password,
+        password,
+      );
+      if (!passwordMatches) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      const accessToken = await this.utils.generateAccessToken({
+        id: user.id,
+        email: user.email,
+        role: Role.STOCK_MANAGER,
+      })
+
+      const refreshToken = await this.utils.generateRefreshToken({
+        id: user.id,
+        email: user.email,
+        role: Role.STOCK_MANAGER,
+      })
+      const { password: _, ...userWithoutPassword } = user;
+      return {
+        success: true,
+        message: 'Successfully logged in',
+        data: { user: userWithoutPassword, accessToken, refreshToken },
+      };
+
+    } catch (err) {
+      if (err instanceof RateLimiterRes) {
+        throw new UnauthorizedException(
+          'Too many login attempts. Please try again later.',
         );
       }
       throw err;

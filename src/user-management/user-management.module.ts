@@ -3,16 +3,12 @@
 import { Module } from '@nestjs/common';
 import { UserManagementService } from './user-management.service';
 import { UserManagementController } from './user-management.controller';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from 'src/auth';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    JwtModule.register({
-      secret: process.env.ACCESS_SECRET_KEY,
-      signOptions: { expiresIn: '1h' },
-    }),
-  ],
+  imports: [AuthModule],
   controllers: [UserManagementController],
-  providers: [UserManagementService],
+  providers: [UserManagementService, JwtService],
 })
 export class UserManagementModule {}

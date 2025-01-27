@@ -1,16 +1,16 @@
 // src/app.module.ts
 
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module';
-import { UtilsModule } from './utils/utils.module';
-import { UserManagementModule } from './user-management/user-management.module';
-import { SupplierModule } from './supplier/supplier.module';
-import { StockModule } from './stock/stock.module';
-import { StockManagerModule } from './stock-manager/stock-manager.module';
-import { ProductModule } from './product/product.module';
-import { JwtModule } from '@nestjs/jwt';
+import { PrismaModule } from './prisma';
+import { UtilsModule } from './utils';
+import { AuthModule } from './auth';
+import { UserManagementModule } from './user-management';
+import { SupplierModule } from './supplier';
+import { StockManagerModule } from './stock-manager';
+import { StockModule } from './stock';
+import { ProductModule } from './product';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -18,10 +18,6 @@ import { JwtModule } from '@nestjs/jwt';
       envFilePath: ['.env'],
       isGlobal: true,
       expandVariables: true,
-    }),
-    JwtModule.register({
-      secret: process.env.ACCESS_SECRET_KEY,
-      signOptions: { expiresIn: '1h' },
     }),
     AuthModule,
     PrismaModule,
@@ -35,4 +31,4 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

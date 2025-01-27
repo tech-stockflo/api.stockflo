@@ -14,11 +14,8 @@ export class StockManagerService {
       throw new NotFoundException('Email already exists');
     }
 
-    return this.prisma.user.create({
-      data: {
-        ...createStockManagerDto,
-        role: 'STOCK_MANAGER',
-      },
+    return this.prisma.stockManager.create({
+      data: createStockManagerDto,
     });
   }
 
@@ -43,16 +40,18 @@ export class StockManagerService {
   }
 
   async getAllStockManagers(stockOwnerId: string) {
-    return this.prisma.user.findMany({
+    return this.prisma.stockManager.findMany({
       where: {
-        role: 'STOCK_MANAGER',
         stockOwnerId
       },
+      include: {
+        stocks: true
+      }
     });
   }
 
   async getStockManagerById(id: string) {
-    const stockManager = await this.prisma.user.findUnique({ where: { id } });
+    const stockManager = await this.prisma.stockManager.findUnique({ where: { id } });
     if (!stockManager) throw new NotFoundException('Stock Manager not found');
 
     return stockManager;

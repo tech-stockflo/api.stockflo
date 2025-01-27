@@ -7,10 +7,17 @@ import { UpdateStockDto } from './dto/update-stock.dto';
 
 @Injectable()
 export class StockService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async createStock(data: CreateStockDto) {
-    return this.prisma.stock.create({ data });
+    return this.prisma.stock.create({
+      data: {
+        ...data,
+        stockManagers: {
+          connect: { id: data.stockManagerId },
+        }
+      },
+    });
   }
 
   async updateStock(id: string, data: UpdateStockDto) {
@@ -23,7 +30,11 @@ export class StockService {
   async updateStockManager(id: string, managerId: string) {
     return this.prisma.stock.update({
       where: { id },
-      data: { managerId },
+      data: {
+        stockManagers: {
+          connect: { id: managerId },
+        },
+      },
     });
   }
 
@@ -41,7 +52,11 @@ export class StockService {
 
   async getAllStocks(managerId: string) {
     return this.prisma.stock.findMany({
-      where: { managerId },
+      where: {
+        stockManagers: {
+          some: { id: managerId },
+        },
+      },
     });
   }
 }

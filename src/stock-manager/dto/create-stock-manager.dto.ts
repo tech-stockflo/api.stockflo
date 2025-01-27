@@ -1,7 +1,7 @@
 // src/stock-manager/dto/create-stock-manager.dto.ts
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { Status } from '@prisma/client';
 
 export class CreateStockManagerDto {
@@ -45,4 +45,12 @@ export class CreateStockManagerDto {
   @IsEnum(Status)
   @IsOptional()
   status?: Status = 'ENABLED';
+
+  @ApiProperty({
+    description: 'The stock owner ID to associate with the stock manager',
+    example: '1565dc54-bf0d-462c-8a04-b01c842e419d',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  stockOwnerId: string;
 }

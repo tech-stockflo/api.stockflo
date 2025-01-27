@@ -3,16 +3,10 @@
 import { Module } from '@nestjs/common';
 import { StockService } from './stock.service';
 import { StockController } from './stock.controller';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    JwtModule.register({
-      secret: process.env.ACCESS_SECRET_KEY,
-      signOptions: { expiresIn: '1h' },
-    }),
-  ],
   controllers: [StockController],
-  providers: [StockService],
+  providers: [StockService, JwtService],
 })
 export class StockModule { }
