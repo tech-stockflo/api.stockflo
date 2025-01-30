@@ -31,17 +31,18 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  stock                 Stock[]
-  stockManager          StockManager[]
+  stock        Stock[]
+  stockManager StockManager[]
 }
 
 model StockManager {
-  id       String @id @default(uuid())
-  email    String @unique
-  userName String
-  fullName String
-  password String
-  status        Status @default(ENABLED)
+  id          String @id @default(uuid())
+  email       String @unique
+  userName    String
+  fullName    String
+  phoneNumber String
+  password    String
+  status      Status @default(ENABLED)
 
   stockOwnerId String
 
@@ -53,9 +54,9 @@ model StockManager {
 }
 
 model UserVerificationCodes {
-  id        String   @id @default(uuid())
-  email     String
-  otp       String
+  id    String @id @default(uuid())
+  email String
+  otp   String
 
   createdAt DateTime @default(now()) @map("created_at")
   expiresAt DateTime @map("expires_at")
@@ -98,7 +99,7 @@ model Product {
   thresholdValue Int
   supplierId     String
   stockId        String
-  status        Status @default(ENABLED)
+  status         Status @default(ENABLED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

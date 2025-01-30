@@ -15,6 +15,15 @@ export class UpdateStockManagerDto {
   fullName?: string;
 
   @ApiProperty({
+    description: 'The username of the stock manager',
+    example: 'stock_manager_01',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  userName?: string;
+
+  @ApiProperty({
     description: 'The status of the stock manager',
     enum: Status,
     example: 'DISABLED',

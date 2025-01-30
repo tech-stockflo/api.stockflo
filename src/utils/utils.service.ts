@@ -124,21 +124,20 @@ export class UtilsService {
 
 
   async getLoggedInUser(req: Request) {
-    const authorization = req.headers.authorization;
-    if (authorization) {
-      const token = authorization.split(' ')[1];
-      if (!authorization.toString().startsWith('Bearer '))
-        throw new UnauthorizedException('The provided token is invalid');
-      const { error } = this.jwtService.verify(token, {
+    const token = req.headers.authorization || req.cookies?.ACCESS_TOKEN;
+
+    if (token) {
+      const { error } = this.jwtService.verify(token.startsWith('Bearer ') ? token.split(' ')[1] : token, {
         secret: this.config.get('ACCESS_SECRET_KEY'),
       });
       if (error)
         throw new BadRequestException(
           'Errow accured while getting the profile ' + error.message,
         );
-      const details: any = await this.jwtService.decode(token);
+      const details: any = await this.jwtService.decode(token.startsWith('Bearer ') ? token.split(' ')[1] : token);
+
       return await this.prisma.user.findUnique({
-        where: { id: details.user },
+        where: { id: details.id },
       });
     } else {
       throw new UnauthorizedException(

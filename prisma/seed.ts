@@ -1,14 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { seedData } from './seed/data-seed';
 import { seedUsers } from './seed/user-seed';
-import { seedOwnerData } from './seed/stock-owner-seed';
+import SeedData from './seed/data.seed';
 const prisma = new PrismaClient();
 
 async function main() {
     console.log('Seeding database...');
     // await seedUsers();
-    await seedData()
-    // await seedOwnerData()
+    // await SeedData();
     console.log('Seeding completed.');
 }
 

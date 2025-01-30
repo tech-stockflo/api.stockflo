@@ -1,12 +1,14 @@
 // src/stock-manager/stock-manager.controller.dto.ts
 
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Query, UseGuards, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { StockManagerService } from './stock-manager.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateStockManagerDto, UpdateStockManagerDto } from './dto';
 import { RoleGuard } from 'src/guards/role/role.guard';
 import { Roles } from 'src/auth/role.decorator';
 import { Role } from '@prisma/client';
+import { UtilsService } from 'src/utils';
 
 @ApiTags('Stock Managers')
 @Controller('stock-managers')
@@ -14,7 +16,10 @@ import { Role } from '@prisma/client';
 @UseGuards(RoleGuard)
 @Roles(Role.ADMIN, Role.STOCK_OWNER)
 export class StockManagerController {
-  constructor(private readonly stockManagerService: StockManagerService) {}
+  constructor(
+    private readonly stockManagerService: StockManagerService,
+    private readonly utils: UtilsService
+  ) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -29,8 +34,10 @@ export class StockManagerController {
   })
   async createStockManager(
     @Body() createStockManagerDto: CreateStockManagerDto,
+    @Req() req: Request
   ) {
-    return this.stockManagerService.createStockManager(createStockManagerDto);
+    const user = await this.utils.getLoggedInUser(req)
+    return this.stockManagerService.createStockManager({ ...createStockManagerDto, stockOwnerId: user.id });
   }
 
   @Put(':id')
@@ -64,19 +71,17 @@ export class StockManagerController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Fetch all stock managers for a stock owner' })
+  @ApiOperation({ summary: 'Fetch all Stock Managers by a Stock Owner' })
   @ApiResponse({
     status: 200,
     description: 'A list of stock managers.',
     isArray: true,
   })
-  @ApiQuery({
-    name: 'stockOwnerId',
-    required: true,
-    description: 'The ID of the stock owner to fetch stock managers for',
-  })
-  async getAllStockManagers(@Query('stockOwnerId') stockOwnerId: string) {
-    return this.stockManagerService.getAllStockManagers(stockOwnerId);
+  async getAllStockManagers(
+    @Req() req: Request
+  ) {
+    const user = await this.utils.getLoggedInUser(req)
+    return this.stockManagerService.getAllStockManagers(user.id);
   }
 
   @Get(':id')
@@ -88,5 +93,27 @@ export class StockManagerController {
   })
   async getStockManagerById(@Param('id') id: string) {
     return this.stockManagerService.getStockManagerById(id);
+  }
+
+  @Put(':id/disable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Disable a stock manager by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The stock manager has been successfully disabled.',
+  })
+  async disableStockManager(@Param('id') id: string) {
+    return this.stockManagerService.disableStockManager(id);
+  }
+
+  @Put(':id/enable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Enable a stock manager by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The stock manager has been successfully enabled.',
+  })
+  async enableStockManager(@Param('id') id: string) {
+    return this.stockManagerService.enableStockManager(id);
   }
 }
