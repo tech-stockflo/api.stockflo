@@ -24,12 +24,12 @@ export class UpdateStockManagerDto {
   userName?: string;
 
   @ApiProperty({
-    description: 'The status of the stock manager',
+    description: 'The Phone number of the stock manager',
     enum: Status,
-    example: 'DISABLED',
+    example: '+250783030869',
     required: false,
   })
   @IsEnum(Status)
   @IsOptional()
-  status?: Status;
+  phoneNumber?: string;
 }

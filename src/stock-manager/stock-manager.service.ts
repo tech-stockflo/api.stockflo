@@ -19,8 +19,8 @@ export class StockManagerService {
     }
     const hashedPassword = await this.utils.hashPassword(createStockManagerDto.password);
 
-    const stockManager = await this.prisma.stockManager.create({
-      data: { ...createStockManagerDto, password: hashedPassword },
+    const stockManager = await this.prisma.user.create({
+      data: { ...createStockManagerDto, password: hashedPassword, emailVerified: true, role: 'STOCK_MANAGER', stockOwnerId: createStockManagerDto.stockOwnerId }
     });
     const { password: _, ...stockManagerWithoutPassword } = stockManager;
 
@@ -40,7 +40,7 @@ export class StockManagerService {
       data: {
         fullName: updateStockManagerDto.fullName,
         userName: updateStockManagerDto.userName,
-        status: updateStockManagerDto.status
+        phoneNumber: updateStockManagerDto.phoneNumber
       },
     });
   }
@@ -53,21 +53,21 @@ export class StockManagerService {
   }
 
   async getAllStockManagers(stockOwnerId: string) {
-    return this.prisma.stockManager.findMany({
+    return this.prisma.user.findMany({
       where: {
         stockOwnerId
       },
       include: {
-        stocks: true
+        managedStocks: true
       }
     });
   }
 
   async getStockManagerById(id: string) {
-    const stockManager = await this.prisma.stockManager.findUnique({
+    const stockManager = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        stocks: true
+        managedStocks: true
       }
     });
     if (!stockManager) throw new NotFoundException('Stock Manager not found');
@@ -76,11 +76,11 @@ export class StockManagerService {
   }
 
   async disableStockManager(id: string) {
-    const stockManager = await this.prisma.stockManager.findUnique({ where: { id } });
+    const stockManager = await this.prisma.user.findUnique({ where: { id } });
 
     if (!stockManager) throw new NotFoundException('Stock Manager not found');
 
-    const deactivatedStockManager = await this.prisma.stockManager.update({
+    const deactivatedStockManager = await this.prisma.user.update({
       where: { id },
       data: {
         status: 'DISABLED'
@@ -97,10 +97,10 @@ export class StockManagerService {
   }
 
   async enableStockManager(id: string) {
-    const stockManager = await this.prisma.stockManager.findUnique({ where: { id } });
+    const stockManager = await this.prisma.user.findUnique({ where: { id } });
     if (!stockManager) throw new NotFoundException('Stock Manager not found');
 
-    const activatedStockManager = await this.prisma.stockManager.update({
+    const activatedStockManager = await this.prisma.user.update({
       where: { id },
       data: {
         status: 'ENABLED'

@@ -3,7 +3,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
-export class SupplierDto {
+export class UpdateSupplierDto {
     @ApiProperty({ description: 'Name of the supplier' })
     @IsString()
     name: string;
@@ -11,12 +11,4 @@ export class SupplierDto {
     @ApiProperty({ description: 'Contact information of the supplier' })
     @IsString()
     contact: string;
-
-    @IsUUID()
-    @IsNotEmpty()
-    stockOwnerId: string;
-
-    @IsUUID()
-    @IsNotEmpty()
-    createdBy: string;
 }

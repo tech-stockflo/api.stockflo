@@ -4,10 +4,8 @@ import SeedData from './seed/data.seed';
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('Seeding database...');
     // await seedUsers();
-    // await SeedData();
-    console.log('Seeding completed.');
+    await SeedData();
 }
 
 main()

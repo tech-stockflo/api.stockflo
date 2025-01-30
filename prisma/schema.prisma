@@ -23,34 +23,20 @@ model User {
   email         String  @unique
   userName      String
   fullName      String
+  phoneNumber   String?
   password      String
   emailVerified Boolean @default(false)
   role          Role    @default(STOCK_OWNER)
   status        Status  @default(ENABLED)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  stock        Stock[]
-  stockManager StockManager[]
-}
-
-model StockManager {
-  id          String @id @default(uuid())
-  email       String @unique
-  userName    String
-  fullName    String
-  phoneNumber String
-  password    String
-  status      Status @default(ENABLED)
-
-  stockOwnerId String
+  stockOwnerId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User    @relation(fields: [stockOwnerId], references: [id], onDelete: Cascade)
-  stocks Stock[] @relation("StockToStockManager")
+  ownedStocks   Stock[]    @relation(name: "StockOwner")
+  managedStocks Stock[]    @relation(name: "StockManagers")
+  Supplier      Supplier[]
 }
 
 model UserVerificationCodes {
@@ -65,14 +51,17 @@ model UserVerificationCodes {
 }
 
 model Supplier {
-  id      String @id @default(uuid())
-  name    String
-  contact String
-  status  Status @default(ENABLED)
+  id           String @id @default(uuid())
+  name         String
+  contact      String
+  status       Status @default(ENABLED)
+  stockOwnerId String
+  createdBy    String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  user     User      @relation(fields: [stockOwnerId], references: [id], onDelete: Cascade)
   products Product[]
 }
 
@@ -87,8 +76,8 @@ model Stock {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user          User           @relation(fields: [stockOwnerId], references: [id], onDelete: Cascade)
-  stockManagers StockManager[] @relation("StockToStockManager")
+  stockOwner    User      @relation(name: "StockOwner", fields: [stockOwnerId], references: [id], onDelete: Cascade)
+  stockManagers User[]    @relation(name: "StockManagers")
   products      Product[]
 }
 

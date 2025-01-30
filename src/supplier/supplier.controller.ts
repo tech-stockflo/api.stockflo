@@ -23,36 +23,12 @@ export class SuppliersController {
     summary: 'Get all suppliers of a stock owner',
     description: 'Fetches a paginated list of suppliers based on user access.',
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number for pagination (defaults to 1)',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Number of items per page (defaults to 10)',
-    example: 10,
-  })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    enum: Status,  // Enum for status values (ENABLED or DISABLED)
-    description: 'Filter suppliers by their status (defaults to "ENABLED")',
-    example: 'ENABLED',
-  })
+  
   async findAll(
-    @Query() query: { page?: number; limit?: number; status?: Status },
     @Req() req: Request
   ) {
-    const { page = 1, limit = 10, status = 'ENABLED' } = query;
-    const accessToken = req.cookies['ACCESS_TOKEN'] || req.headers['authorization']?.split(' ')[1];
-    const decodedToken = await this.utils.decodeAccessToken(accessToken);
-    const userId = decodedToken.id;
-    return this.suppliersService.findAll({ page, limit, status, userId });
+    const user = await this.utils.getLoggedInUser(req);
+    return this.suppliersService.findAll(user.id);
   }
 
 
@@ -74,8 +50,12 @@ export class SuppliersController {
     description: 'Supplier registration details',
     type: SupplierDto,
   })
-  create(@Body() supplierDto: SupplierDto) {
-    return this.suppliersService.create(supplierDto);
+  async create(
+    @Body() supplierDto: SupplierDto,
+    @Req() req: Request
+  ) {
+    const user = await this.utils.getLoggedInUser(req);
+    return this.suppliersService.create({...supplierDto, createdBy: user.id, stockOwnerId: user.stockOwnerId ? user.stockOwnerId : user.id });
   }
 
   @Put(':id')
