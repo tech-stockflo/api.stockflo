@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,6 +27,7 @@ model User {
   fullName      String
   phoneNumber   String?
   password      String
+  picture       String?
   emailVerified Boolean @default(false)
   role          Role    @default(STOCK_OWNER)
   status        Status  @default(ENABLED)
@@ -82,13 +85,14 @@ model Stock {
 }
 
 model Product {
-  id             String @id @default(uuid())
+  id             String   @id @default(uuid())
   name           String
   quantity       Int
   thresholdValue Int
   supplierId     String
+  pictures       String[]
   stockId        String
-  status         Status @default(ENABLED)
+  status         Status   @default(ENABLED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

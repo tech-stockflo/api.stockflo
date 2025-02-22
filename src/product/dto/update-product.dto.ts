@@ -1,6 +1,6 @@
 // src/product/dto/update-product.dto.ts
 
-import { IsString, IsInt, Min, IsUUID, IsOptional } from 'class-validator';
+import { IsString, IsInt, Min, IsUUID, IsOptional, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProductDto {
@@ -33,6 +33,16 @@ export class UpdateProductDto {
   @Min(0)
   @IsOptional()
   thresholdValue?: number;
+
+  @ApiProperty({
+    description: 'Array of uploaded pictures',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+  })
+  @IsArray()
+  @IsOptional()
+  pictures?: string[];
+
 
   @ApiProperty({
     description: 'Supplier ID of the product',

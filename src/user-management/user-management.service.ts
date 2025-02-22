@@ -75,4 +75,25 @@ export class UserManagementService {
             message: 'Account enabled successfully',
         };
     }
+
+    // Upload avatar
+    async uploadAvatar({fileName, userId} : {fileName: string, userId: string}) {
+        const avatar = await this.prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                picture: fileName
+            }
+        })
+
+        return{
+            success: true,
+            message: "Avatar uploaded successfully",
+            data: {
+                id: avatar.id,
+                picture: `/uploads/auth/${avatar.picture}`
+            }
+        }
+    }
 }

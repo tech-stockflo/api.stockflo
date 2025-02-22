@@ -13,6 +13,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
 import { Request } from 'express';
 import * as nodemailer from 'nodemailer';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
 
 @Injectable()
 export class UtilsService {

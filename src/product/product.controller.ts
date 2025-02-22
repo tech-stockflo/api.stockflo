@@ -1,13 +1,14 @@
 // src/product/product.controller.ts
 
-import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/auth/role.decorator';
 import { RoleGuard } from 'src/guards/role/role.guard';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Products')
 @Controller('products')
@@ -36,12 +37,20 @@ export class ProductController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update a product' })
+  @ApiOperation({ summary: 'Update a product with pictures' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Update product data with pictures',
+    type: UpdateProductDto,
+  })
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'pictures', maxCount: 5 }]))
   async update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() files: { pictures?: Express.Multer.File[] }
   ) {
-    return this.productService.update(id, updateProductDto);
+    const picturePaths = files.pictures?.map(file => file.path) || [];
+    return this.productService.update(id, { ...updateProductDto, pictures: picturePaths });
   }
 
   @Delete(':id')
@@ -49,4 +58,6 @@ export class ProductController {
   async remove(@Param('id') id: string) {
     return this.productService.remove(id);
   }
+
+
 }
