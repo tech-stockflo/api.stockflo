@@ -18,8 +18,8 @@ async function bootstrap() {
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
   const config = new DocumentBuilder()
-    .setTitle('SMS API Documentation')
-    .setDescription('API documentation for the SMS application developed by PROP 😎')
+    .setTitle('Stockflo API Documentation')
+    .setDescription('API documentation for the Stockflo application developed by PROP 😎')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

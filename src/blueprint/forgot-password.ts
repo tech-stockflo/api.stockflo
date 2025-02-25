@@ -72,7 +72,7 @@ export const forgotPasswordTemplate = (otp: string) => `
         <p>If you did not request this OTP, please ignore this email.</p>
       </div>
       <div class="footer">
-        <p>&copy; 2025 SMS. All rights reserved.</p>
+        <p>&copy; 2025 stockflo. All rights reserved.</p>
       </div>
     </div>
   </body>

@@ -66,7 +66,7 @@ export const welcomeTemplate = (otp: string) => `
   <body>
     <div class="container">
       <div class="header">
-        <h1>Thank you for registering on SMS</h1>
+        <h1>Thank you for registering on stockflo</h1>
       </div>
       <div class="content">
         <p>Here is your OTP code for account verification:</p>
@@ -75,7 +75,7 @@ export const welcomeTemplate = (otp: string) => `
         <p>If you did not request this OTP, please ignore this email.</p>
       </div>
       <div class="footer">
-        <p>&copy; 2025 SMS. All rights reserved.</p>
+        <p>&copy; 2025 stockflo. All rights reserved.</p>
       </div>
     </div>
   </body>

@@ -37,7 +37,7 @@ export class UtilsService {
   sendEmail = async (to: string, html: any, subject: string) => {
     try {
       const mailOptions = {
-        from: 'info@sms.com',
+        from: 'info@stockflo.com',
         to,
         subject,
         html,

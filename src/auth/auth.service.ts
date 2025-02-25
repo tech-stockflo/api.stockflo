@@ -180,7 +180,7 @@ export class AuthService {
       await this.utils.sendEmail(
         user.email,
         resetCodeMessage,
-        'Password Reset Code - SMS',
+        'Password Reset Code - Stockflo',
       );
 
       const expiresAt = new Date(Date.now() + 10 * 60000);
@@ -359,7 +359,7 @@ export class AuthService {
       await this.utils.sendEmail(
         user.email,
         activationCodeMessage,
-        'Account Activation Code - SMS',
+        'Account Activation Code - stockflo',
       );
 
       const expiresAt = new Date(Date.now() + 10 * 60000);
