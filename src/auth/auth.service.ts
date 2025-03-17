@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UtilsService } from 'src/utils/utils.service';
 import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
 import { ResetEmailDto, SendActivationEmailDto, ChangePasswordDto, ResetPasswordDto, ActivateAccountDto, ChangeEmailDto, RefreshTokenDto, LoginDto, UserDto } from './dto';
-import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {

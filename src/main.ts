@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api/v1');
-  app.enableCors({ credentials: true, origin: "*" });
+  app.enableCors({ credentials: true, origin: "http://localhost:3000" });
   app.use(cookieParser());
   app.use(morgan('tiny'));
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
